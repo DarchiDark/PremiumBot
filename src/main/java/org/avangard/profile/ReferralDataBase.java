@@ -8,6 +8,33 @@ import java.util.Map;
 public class ReferralDataBase extends DataBase {
     public ReferralDataBase(String jdbcUrl, String userName, String password) {
         super(jdbcUrl, userName, password);
+        initialize();
+    }
+
+    private void initialize() {
+        String createReferrals = """
+            CREATE TABLE IF NOT EXISTS referrals (
+                presenter VARCHAR(255) PRIMARY KEY,
+                activations INT NOT NULL DEFAULT 0
+            )
+        """;
+
+        String createActivators = """
+            CREATE TABLE IF NOT EXISTS referral_activators (
+                id BIGINT PRIMARY KEY,
+                referral VARCHAR(255),
+                FOREIGN KEY (referral) REFERENCES referrals(presenter)
+                    ON DELETE CASCADE ON UPDATE CASCADE
+            )
+        """;
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(createReferrals);
+            stmt.execute(createActivators);
+        } catch (SQLException e) {
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
+        }
     }
 
     public void incrementActivations(String id, String presenter) {
@@ -33,7 +60,7 @@ public class ReferralDataBase extends DataBase {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -44,7 +71,7 @@ public class ReferralDataBase extends DataBase {
             stmt.setString(1, presenter);
             stmt.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -57,7 +84,7 @@ public class ReferralDataBase extends DataBase {
             stmt2.setString(1, presenter);
             stmt2.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -70,7 +97,7 @@ public class ReferralDataBase extends DataBase {
                 if (rs.next()) return rs.getInt("activations");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
         return 0;
     }
@@ -87,7 +114,7 @@ public class ReferralDataBase extends DataBase {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
         return top;
     }

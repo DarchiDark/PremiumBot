@@ -8,7 +8,7 @@ public class Config {
     private static final Properties properties = new Properties();
 
     static {
-        try (FileInputStream in = new FileInputStream("D:\\config\\config.yml")) {
+        try (FileInputStream in = new FileInputStream("config.yml")) {
             properties.load(in);
         } catch (IOException e) {
             throw new RuntimeException("Не удалось загрузить конфигурационный файл.", e);

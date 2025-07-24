@@ -6,6 +6,24 @@ import java.sql.*;
 public class ProfileDatabase extends DataBase {
     public ProfileDatabase(String jdbcUrl, String userName, String password) {
         super(jdbcUrl, userName, password);
+        initialize();
+    }
+
+    private void initialize() {
+        String query = """
+            CREATE TABLE IF NOT EXISTS profiles (
+                uuid BIGINT PRIMARY KEY,
+                user_group VARCHAR(50) NOT NULL,
+                expire_time DATE
+            )
+        """;
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(query);
+        } catch (SQLException e) {
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
+        }
     }
 
     public void setGroup(long id, Group group, Date expireTime) {
@@ -19,7 +37,7 @@ public class ProfileDatabase extends DataBase {
                 saveProfile(new Profile(id, group, expireTime));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -39,7 +57,7 @@ public class ProfileDatabase extends DataBase {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
 
         Profile newProfile = new Profile(id, Group.DEFAULT, null);
@@ -57,7 +75,7 @@ public class ProfileDatabase extends DataBase {
             stmt.setDate(3, profile.getExpireTime());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 

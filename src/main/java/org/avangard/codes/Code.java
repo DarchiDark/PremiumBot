@@ -19,10 +19,10 @@ public class Code {
     private LocalDate time;
     private long permissionTime;
 
-    public static Code generate(boolean unlimited, int activations, String permission, long permissionTime) {
+    public static Code generate(boolean unlimited, int activations, String permission, long permissionTime, int code_time_days) {
         String id = generateRandom(8, "abcdefghijklmnopqrstuvwxyz0123456789");
         String code = generateRandom(15, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
-        LocalDate time = LocalDate.now().plusDays(3);
+        LocalDate time = LocalDate.now().plusDays(code_time_days);
         return new Code(id, code, unlimited, activations, permission, time, permissionTime);
     }
 

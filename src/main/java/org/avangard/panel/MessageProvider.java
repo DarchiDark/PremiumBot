@@ -100,6 +100,23 @@ public class MessageProvider {
                 "\nВаша подписка \uD83C\uDFA9\\: " + profile.getGroup().name();
     }
 
+    // TODO
+    public static String onContent(String chatId) {
+        ProfileDatabase database = Main.profileDatabase;
+        Profile profile = database.getProfile(Long.parseLong(chatId));
+        if(profile.getExpireTime() != null) {
+            LocalDate expireDate = profile.getExpireTime().toLocalDate();
+
+            String formatted = expireDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+                    .replaceAll("\\d", "\\\\$0") // экранируем цифры
+                    .replace(".", "\\.");      // экранируем точки
+            return "Ваш профиль \uD83D\uDCBC \nВаш айди \uD83C\uDD94\\: " + chatId +
+                    "\nВаша подписка \uD83C\uDFA9\\: " + profile.getGroup().name() + (expireDate.getYear() < 4000 ? "\nПодписка истекает\\: " + formatted : "\nПодписка истекает\\: Навсегда");
+        }
+        return "Ваш профиль \uD83D\uDCBC \nВаш айди \uD83C\uDD94\\: " + chatId +
+                "\nВаша подписка \uD83C\uDFA9\\: " + profile.getGroup().name();
+    }
+
     public static String onBuy(String chatId) {
         return "\uD83D\uDCB5 Напишите на аккаунт @test. Ваш личный код: " + chatId;
     }

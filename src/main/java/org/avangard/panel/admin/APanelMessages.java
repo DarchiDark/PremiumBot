@@ -139,8 +139,8 @@ public class APanelMessages {
             );
 
             String[] parts = messageText.split(",");
-            if (parts.length != 3) {
-                sendMessage.setText("Используйте формат: количество,привилегия,время\nПример: 3,vip,1mo или unlim,premium,7d");
+            if (parts.length != 4) {
+                sendMessage.setText("Используйте формат: количество,привилегия,время,дни-действия-кода\nПример: 3,vip,1mo,5 или unlim,premium,7d,5");
                 try {
                     telegramBot.execute(sendMessage);
                 } catch (TelegramApiException ex) {
@@ -152,31 +152,22 @@ public class APanelMessages {
             String countArg = parts[0].trim();
             String permission = parts[1].trim();
             String timeArg = parts[2].trim();
+            String CodeTimeArg = parts[3].trim();
 
             Code code;
             try {
                 boolean unlimited = countArg.equalsIgnoreCase("unlim");
                 int activations = unlimited ? 100 : Integer.parseInt(countArg);
 
-                long time = 0;
-                if (timeArg.endsWith("d")) {
-                    int days = Integer.parseInt(timeArg.replace("d", ""));
-                    time+=days;
-                } else if (timeArg.endsWith("mo")) {
-                    int months = Integer.parseInt(timeArg.replace("mo", ""));
-                    time+= months*30L;
-                } else if (timeArg.endsWith("y")) {
-                    int years = Integer.parseInt(timeArg.replace("y", ""));
-                    time+=years*12L*30;
-                } else {
-                    throw new IllegalArgumentException("Неверный формат времени.");
-                }
+                long time = getTime(timeArg);
+                int days = Integer.parseInt(CodeTimeArg);
 
                 code = Code.generate(
                         unlimited,
                         activations,
                         permission,
-                        time
+                        time,
+                        days
                 );
 
 
@@ -189,7 +180,7 @@ public class APanelMessages {
                                 "Действие кода закончится " + code.getTime() + "!"
                 );
             } catch (Exception e) {
-                sendMessage.setText("Ошибка при обработке команды. Проверьте формат ввода.");
+                sendMessage.setText("Используйте формат: количество,привилегия,время,дни-действия-кода\nПример: 3,vip,1mo,5 или unlim,premium,7d,5");
             }
 
             sendMessage.setReplyMarkup(KeyBoardManager.keyBoardBuilder("✅ Добавить%nb%❌ Удалить%nl%↪️ Обратно"));
@@ -244,6 +235,23 @@ public class APanelMessages {
                 adminPanel.setEditDirection(EditDirection.CODES_REMOVE);
             }
         }
+    }
+
+    private static long getTime(String timeArg) {
+        long time = 0;
+        if (timeArg.endsWith("d")) {
+            int days = Integer.parseInt(timeArg.replace("d", ""));
+            time+=days;
+        } else if (timeArg.endsWith("mo")) {
+            int months = Integer.parseInt(timeArg.replace("mo", ""));
+            time+= months*30L;
+        } else if (timeArg.endsWith("y")) {
+            int years = Integer.parseInt(timeArg.replace("y", ""));
+            time+=years*12L*30;
+        } else {
+            throw new IllegalArgumentException("Неверный формат времени.");
+        }
+        return time;
     }
 
     private static Pair<String, ReplyKeyboardMarkup> adminPanel(String messageText, String chatId) {

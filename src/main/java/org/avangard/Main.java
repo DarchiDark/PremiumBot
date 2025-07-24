@@ -1,5 +1,6 @@
 package org.avangard;
 
+import lombok.SneakyThrows;
 import org.avangard.codes.CodesDataBase;
 import org.avangard.profile.ProfileDatabase;
 import org.avangard.telegram.TelegramBot;
@@ -8,26 +9,19 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.nio.file.InvalidPathException;
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
-    public static Path path;
-
-    public static CodesDataBase codesDataBase = new CodesDataBase(Config.getString("Url"), Config.getString("UserName"), Config.getString("Password"));
-    public static ProfileDatabase profileDatabase = new ProfileDatabase(Config.getString("Url"), Config.getString("UserName"), Config.getString("Password"));
+    public static CodesDataBase codesDataBase;
+    public static ProfileDatabase profileDatabase;
 
     public static void main(String[] args) {
-        if(args.length < 1) {
-            System.out.println("Specify path to config in arguments (java -jar ___.jar C:\\...)");
-            return;
-        }
-        try {
-            path = Path.of(args[0]);
-        } catch (InvalidPathException e) {
-            System.out.println("Invalid path! Specify path to config in arguments (java -jar ___.jar C:\\... (for windows. For linux or mac else) )");
-            return;
-        }
+        generateFiles();
+        codesDataBase = new CodesDataBase(Config.getString("Url"), Config.getString("UserName"), Config.getString("Password"));
+        profileDatabase = new ProfileDatabase(Config.getString("Url"), Config.getString("UserName"), Config.getString("Password"));
         TelegramBotsApi botsApi;
         try {
             botsApi = new TelegramBotsApi(DefaultBotSession.class);
@@ -40,5 +34,29 @@ public class Main {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SneakyThrows
+    public static void generateFiles() {
+        File config_file = new File("config.yml");
+        if(!config_file.exists()) {
+            boolean isCreated = config_file.createNewFile();
+            if(isCreated) {
+                String defaultConfig = """
+                        Url: jdbc:mysql://localhost:3306/premiumbot
+                        UserName: root
+                        Password: admin
+                        Bot_token: default_token
+                        """;
+
+                Files.write(Paths.get(config_file.getPath()), defaultConfig.getBytes());
+            }
+        }
+
+        File content_folder = new File("content");
+        if(!content_folder.exists()) {
+            content_folder.mkdir();
+        }
+
     }
 }

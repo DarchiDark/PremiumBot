@@ -32,7 +32,7 @@ public class KeyBoardManager {
 
     public static ReplyKeyboardMarkup getUserPanel(String chatId) {
         String keyboardStr = "Профиль \uD83D\uDCBC%nb%Активировать код \uD83D\uDC8E%nl%Купить подписку \uD83D\uDCB5";
-        ProfileDatabase database = Main.profileDatabase;
+        ProfileDatabase database = Main.profileDatabase; // %nb%Доступный контент 📁
         if (database.getProfile(Long.parseLong(chatId)).getGroup().equals(Group.ADMIN)) {
             keyboardStr += "%nb%Админ-панель \uD83D\uDC68\u200D\uD83D\uDCBB";
         }

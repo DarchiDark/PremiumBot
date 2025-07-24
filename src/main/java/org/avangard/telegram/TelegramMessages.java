@@ -37,6 +37,29 @@ public class TelegramMessages {
         }
     }
 
+    // ToDo
+    public static void availableContent(String chatId, TelegramBot telegramBot) {
+        String text = "*Загружаю данные\\.\\.\\.*";
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(text);
+        message.setParseMode("MarkdownV2");
+        try {
+            Message sent = telegramBot.execute(message);
+            text = MessageProvider.onProfile(chatId);
+            EditMessageText edit = new EditMessageText();
+            edit.setChatId(chatId);
+            edit.setMessageId(sent.getMessageId());
+            edit.setParseMode("MarkdownV2");
+            edit.setText(text);
+            ReplyKeyboardMarkup keyboardMarkup = KeyBoardManager.getUserPanel(chatId);
+            message.setReplyMarkup(keyboardMarkup);
+            telegramBot.execute(edit);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void buy(String chatId, TelegramBot telegramBot) {
         String text = MessageProvider.onBuy(chatId);
         SendMessage message = new SendMessage();

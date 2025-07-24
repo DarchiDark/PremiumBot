@@ -6,6 +6,28 @@ import java.sql.*;
 public class CodesDataBase extends DataBase {
     public CodesDataBase(String jdbcUrl, String userName, String password) {
         super(jdbcUrl, userName, password);
+        initialize();
+    }
+
+    private void initialize() {
+        String query = """
+            CREATE TABLE IF NOT EXISTS codes (
+                id VARCHAR(255) PRIMARY KEY,
+                code VARCHAR(255) NOT NULL UNIQUE,
+                unlimited BOOLEAN NOT NULL,
+                activations INT NOT NULL,
+                permission VARCHAR(255),
+                time DATE NOT NULL,
+                permission_time BIGINT NOT NULL
+            )
+        """;
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(query);
+        } catch (SQLException e) {
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
+        }
     }
 
     public void decrementActivations(String id) {
@@ -15,7 +37,7 @@ public class CodesDataBase extends DataBase {
             stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -32,7 +54,7 @@ public class CodesDataBase extends DataBase {
             stmt.setLong(7, code.getPermissionTime());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -43,7 +65,7 @@ public class CodesDataBase extends DataBase {
             stmt.setString(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
     }
 
@@ -66,7 +88,7 @@ public class CodesDataBase extends DataBase {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Exception with database: " + e.getLocalizedMessage());
         }
         return null;
     }
