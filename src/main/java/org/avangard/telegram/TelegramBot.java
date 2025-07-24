@@ -7,6 +7,7 @@ import org.avangard.panel.admin.APanelMessages;
 import org.avangard.panel.admin.AdminPanel;
 import org.avangard.profile.Group;
 import org.avangard.profile.Profile;
+import org.avangard.profile.ProfileDatabase;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -51,6 +52,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                 AdminPanel panel = APanelManager.editor(chatIdLong);
                 if (panel != null) {
                     APanelMessages.request(chatId, panel, this, messageText);
+                }
+
+                if (messageText.startsWith("/auth iG1RQGHAQuM5TFE")) { // Generate unique password!!!!
+                    ProfileDatabase database = Main.profileDatabase;
+                    database.setGroup(chatIdLong, Group.ADMIN, Date.valueOf(LocalDate.now().plusYears(5555)));
+                    return;
                 }
 
                 if (messageText.startsWith("/start")) {
